@@ -146,8 +146,6 @@
 @property (nonatomic, assign) CGFloat arrowOffset;
 /** 箭头朝向 */
 @property (nonatomic, assign) CZHPopUpViewDirectionType directionType;
-/** rgb的可变数组 */
-@property (nonatomic, strong) NSMutableArray *rgbStrValueArr;
 ///
 @property (nonatomic, strong) NSMutableArray *itemArrays;
 ///
@@ -163,35 +161,6 @@
     return _itemArrays;
 }
 
--(NSMutableArray *)rgbStrValueArr{
-    if (!_rgbStrValueArr) {
-        _rgbStrValueArr = [NSMutableArray array];
-    }
-    return _rgbStrValueArr;
-}
-
-#pragma mark - UIColor转RGB
--(NSMutableArray *)rgbWithUIColor:(UIColor *)color{
-    NSMutableArray *RGBStrValueArr = [[NSMutableArray alloc] init];
-    //获得RGB值描述
-    NSString *RGBValue = [NSString stringWithFormat:@"%@",color];
-    //将RGB值描述分隔成字符串
-    NSArray *RGBArr = [RGBValue componentsSeparatedByString:@" "];
-    //获取红色值
-    NSNumber *r = @([[RGBArr objectAtIndex:1] floatValue]);
-    [RGBStrValueArr addObject:r];
-    //获取绿色值
-    NSNumber *g = @([[RGBArr objectAtIndex:2] floatValue]);
-    [RGBStrValueArr addObject:g];
-    //获取蓝色值
-    NSNumber *b = @([[RGBArr objectAtIndex:3] floatValue]);
-    [RGBStrValueArr addObject:b];
-    //获取透明度
-    NSNumber *a = @([[RGBArr objectAtIndex:4] floatValue]);
-    [RGBStrValueArr addObject:a];
-    //返回保存RGB值的数组
-    return RGBStrValueArr;
-}
 
 + (instancetype)czh_popUpWithPoint:(CGPoint)point arrowOffset:(CGFloat)arrowOffset {
     
@@ -418,9 +387,7 @@
     _containerBackgroundColor = containerBackgroundColor;
     
     self.containerView.backgroundColor = containerBackgroundColor;
-    
-    self.rgbStrValueArr = [self rgbWithUIColor:containerBackgroundColor];
-    
+
     [self setNeedsDisplay];
 
 }
@@ -456,20 +423,24 @@
     }
     
     CGContextAddLines(context, sPoints, 3);//添加线
-    //填充色
-    CGFloat r = 1.0;
-    CGFloat g = 1.0;
-    CGFloat b = 1.0;
-    CGFloat a = 1.0;
+
+
+    //获得RGB值描述
+    NSString *RGBValue = [NSString stringWithFormat:@"%@",self.containerBackgroundColor];
+    //将RGB值描述分隔成字符串
+    NSArray *RGBArr = [RGBValue componentsSeparatedByString:@" "];
+    //获取红色值
+    CGFloat r = [[RGBArr objectAtIndex:1] floatValue];
     
-    if (self.rgbStrValueArr.count > 0) {
-        
-        r = [self.rgbStrValueArr[0] floatValue];
-        g = [self.rgbStrValueArr[1] floatValue];
-        b = [self.rgbStrValueArr[2] floatValue];
-        a = [self.rgbStrValueArr[3] floatValue];
-        
-    }
+    //获取绿色值
+    CGFloat g = [[RGBArr objectAtIndex:2] floatValue];
+   
+    //获取蓝色值
+    CGFloat b = [[RGBArr objectAtIndex:3] floatValue];
+   
+    //获取透明度
+    CGFloat a = [[RGBArr objectAtIndex:4] floatValue];
+    
 
     CGContextSetFillColorWithColor(context, self.containerBackgroundColor.CGColor);
     //画线笔颜色
